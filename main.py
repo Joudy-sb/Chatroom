@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
+# this is a comment
 rooms = {}
 
 def generate_unique_code(length):
