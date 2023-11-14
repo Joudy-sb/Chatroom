@@ -11,7 +11,6 @@ room_users = {}
 room_keys = set()
 message_history = {}
 
-
 def generate_key():
     while True: 
         key = ""
@@ -23,7 +22,7 @@ def generate_key():
     return key
 
 @app.route('/')
-def main():
+def home():
     return render_template('home.html')
 
 @app.route('/create_room')
@@ -33,19 +32,27 @@ def create_room():
 @app.route("/room")
 def room():
     room_key = session.get("room")
-    return render_template("room.html", room_key=room_key)
+    user_name = session.get("name")
+
+    if room_key is None or user_name is None or room_key not in room_keys:
+        return redirect(url_for("home"))
+    
+    return render_template("room.html", room_key=room_key, messages=message_history[room_key])
 
 @app.route('/process_create_room', methods=['POST'])
 def process_create_room():
     user_name = request.form['name']
-    room_key = generate_key()
-
-    room_users[room_key] = [user_name]
+    room_key = generate_key() # automatically add the room key to list of keys
 
     session["name"] = user_name
     session["room"] = room_key
 
+    # create a room key and store the members in the room
     room_users.setdefault(room_key, []).append(user_name)
+
+    # create a message history 
+    if room_key not in message_history:
+        message_history[room_key] = []
 
     return redirect(url_for("room"))
 
@@ -61,7 +68,8 @@ def process_join_room():
     if room_key not in room_keys:
         return render_template('join_room.html', error='Room does not exist.')
     
-    room_users.setdefault(room_key, []).append(user_name)
+    # add user to the room
+    room_users[room_key].append(user_name)
     
     session["room"] = room_key
     session["name"] = user_name
@@ -69,19 +77,22 @@ def process_join_room():
     return redirect(url_for("room"))
 
 @socketio.on('connect')
-def connect():
+def connect(auth):
     user_name = session.get('name')
     room_key = session.get('room')
 
+    # an error in the session information
     if not user_name or not room_key:
-        return False 
+        return  
 
+    # if room does no exist, error
     if room_key not in room_keys:
-        send({"name": user_name, "message": "Room does not exist."}, room=room_key)
-        return False 
+        leave_room(room_key)
+        return 
 
     join_room(room=room_key)
-    send({"name": user_name, "message": "has entered the room"}, room=room_key)
+
+    send({"name": user_name, "message": "has entered the room"}, to=room_key)
 
     print(f"{user_name} joined room {room_key}")
 
@@ -90,21 +101,24 @@ def disconnect():
     user_name = session.get("name")
     room_key = session.get("room")
     leave_room(room_key)
-    
-    if not room_key:
-        print(f"{user_name} has disconnected and was not in any room.")
-        return False
 
-    if room_key in room_keys:
-        room_users[room_key].remove(user_name)
+    # Check if room_key exists in room_users dictionary
+    if room_key and room_key in room_users:
 
-        if not room_users[room_key]:
-            del room_users[room_key]
-            room_keys.remove(room_key)
+        # Perform action with room_users[room_key]
+        if user_name in room_users[room_key]:
+            room_users[room_key].remove(user_name)
+
+            # if there are no more users
+            if not room_users[room_key]:
+                del room_users[room_key]
+                room_keys.remove(room_key)
 
         send({"name": user_name, "message": "has left the room"}, room=room_key)
+        print(f"{user_name} left room {room_key}")
+    else:
+        print(f"Attempted to disconnect from an unknown room {room_key}")
 
-    print(f"{user_name} left room {room_key}")
 
 @socketio.on('message')
 def message(data):
@@ -118,22 +132,13 @@ def message(data):
         "name": user_name,
         "message": data['data']
     }
-
-    if room_key not in message_history:
-        message_history[room_key] = []
     
+    # append messages sent to history
     message_history[room_key].append(content)
 
     send(content, to=room_key)
+
     print(f"{user_name} said: {data['data']}")
-
-@socketio.on('request_history')
-def handle_request_history():
-    room_key = session.get('room')
-    if room_key in message_history:
-        for msg in message_history[room_key]:
-            emit('message', msg, room=request.sid)
-
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
