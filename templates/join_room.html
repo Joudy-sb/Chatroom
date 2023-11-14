@@ -1,9 +1,9 @@
-{% block content %} 
+{% extends 'base.html' %} {% block content %}
 
 <div> 
     <form method="POST" action="/process_join_room">
-        <label for="Name">Name:</label>
-        <input type="text" id="Name" name="Name" required>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
         <label for="key">Room Key:</label>
         <input type="text" id="key" name="key" required>
         <input type="submit" value="Enter">

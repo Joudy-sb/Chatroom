@@ -1,9 +1,54 @@
-{% block content %} 
+{% extends 'base.html' %} {% block content %}
+<h2>Chat Room: {{room_key}}</h2>
+<div id="messages"></div> <!-- This is where messages will be displayed -->
+<div>
+    <div class="inputs">
+      <input type="text" placeholder="Message" name="message" id="message"/>
+      <button type="button" name="send" id="send-btn" onClick="sendMessage()">Send</button>
+    </div>
+  </div>
 
-<div> 
-    <p>hello</p>
-    <p>welcome to room {{room_key}}</p>
-</div>
+  <script type="text/javascript">
+    var socketio = io();
+
+    // Listen for incoming messages from the server
+    socketio.on("message", function(data) {
+        // Use the data sent by the server
+        createMessage(data.name, data.message);
+    });
+
+    function sendMessage() {
+        const messageInput = document.getElementById("message");
+        const message = messageInput.value.trim(); // Retrieves what the user has typed.
+
+        if (message) {
+            // Emit the message to the server
+            socketio.emit("message", { data: message });
+            messageInput.value = ""; // Clear the input after sending
+        }
+    }
+
+    function createMessage(name, msg) {
+        const messagesContainer = document.getElementById("messages");
+        const timeStamp = new Date().toLocaleString(); // Time of message
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("text");
+
+        // Template to display the message
+        const messageContent = `
+            <span>
+                <strong>${name}</strong>: ${msg}
+            </span>
+            <span class="muted">
+                ${timeStamp}
+            </span>
+        `;
+
+        messageElement.innerHTML = messageContent;
+        messagesContainer.appendChild(messageElement); // Append the new message to the container
+    }
+
+</script>
 
 
 {% endblock %}
