@@ -1,7 +1,7 @@
 from flask import Flask, redirect, render_template, request, session, url_for
 import random
 from string import ascii_uppercase
-from flask_socketio import SocketIO, leave_room, send, join_room
+from flask_socketio import SocketIO, emit, leave_room, send, join_room
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "line&joods"
@@ -9,6 +9,8 @@ socketio = SocketIO(app)
 
 room_users = {}
 room_keys = set()
+message_history = {}
+
 
 def generate_key():
     while True: 
@@ -42,6 +44,8 @@ def process_create_room():
 
     session["name"] = user_name
     session["room"] = room_key
+
+    room_users.setdefault(room_key, []).append(user_name)
 
     return redirect(url_for("room"))
 
@@ -85,7 +89,8 @@ def connect():
 def disconnect():
     user_name = session.get("name")
     room_key = session.get("room")
-
+    leave_room(room_key)
+    
     if not room_key:
         print(f"{user_name} has disconnected and was not in any room.")
         return False
@@ -114,9 +119,21 @@ def message(data):
         "message": data['data']
     }
 
+    if room_key not in message_history:
+        message_history[room_key] = []
+    
+    message_history[room_key].append(content)
+
     send(content, to=room_key)
     print(f"{user_name} said: {data['data']}")
-    
+
+@socketio.on('request_history')
+def handle_request_history():
+    room_key = session.get('room')
+    if room_key in message_history:
+        for msg in message_history[room_key]:
+            emit('message', msg, room=request.sid)
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

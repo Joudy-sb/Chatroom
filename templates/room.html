@@ -11,6 +11,11 @@
   <script type="text/javascript">
     var socketio = io();
 
+    // Request the message history when the client connects
+    socketio.on("connect", function() {
+        socketio.emit("request_history"); // This would be a new event that the server needs to handle
+    });
+
     // Listen for incoming messages from the server
     socketio.on("message", function(data) {
         // Use the data sent by the server
