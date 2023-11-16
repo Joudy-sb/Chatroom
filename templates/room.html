@@ -1,21 +1,31 @@
 {% extends 'base.html' %} {% block content %}
-<h2>Chat Room: {{room_key}}</h2>
-<div id="messages"></div> <!-- This is where messages will be displayed -->
-<div>
-    <div class="inputs">
-      <input type="text" placeholder="Message" name="message" id="message"/>
-      <button type="button" name="send" id="send-btn" onClick="sendMessage()">Send</button>
-    </div>
-    <div>      
-        <a href="/"><button>Leave</button></a>  
-    </div>
-  </div>
+<link
+rel="stylesheet"
+href="{{url_for('static', filename='css/room.css')}}"
+/>
+<a href="/"><button style="position:absolute; width: 100px; margin-left: 10px; margin-top: 5px;">Leave room</button></a>  
+<h2 style="text-align: center;">Chat Room: {{room_key}}</h2>
+
+<div class="chatbox">
+    <div class="messages" id="messages"></div> <!-- This is where messages will be displayed -->
+</div>
+<div class="inputs">
+    <button style="width: 100px;" type="button" name="dcr" id="decrypt-btn" onClick="decryptMessage()">Decrypt</button>
+    <input type="text" placeholder="Message" name="message" id="message" style="width: 775px;" />
+    <button style="width: 100px;" type="button" name="send" id="send-btn" onClick="sendMessage()">Send</button>
+</div>
+
 
   <script type="text/javascript">
     var socketio = io();
 
     // Listen for incoming messages from the server
     socketio.on("message", function(data) {
+        // Use the data sent by the server
+        createMessage(data.name, data.message);
+    });
+
+    socketio.on("decrypt", function(data) {
         // Use the data sent by the server
         createMessage(data.name, data.message);
     });
@@ -42,13 +52,27 @@
             <span>
                 <strong>${name}</strong>: ${msg}
             </span>
-            <span class="muted">
-                ${timeStamp}
-            </span>
+            <div class="muted">
+                <span>
+                    ${timeStamp}
+                </span>
+            </div>
         `;
+
 
         messageElement.innerHTML = messageContent;
         messagesContainer.appendChild(messageElement); // Append the new message to the container
+    }
+
+    function decryptMessage() {
+        const messageInput = document.getElementById("message");
+        const message = messageInput.value.trim(); // Retrieves what the user has typed.
+
+        if (message) {
+            // Emit the message to the server
+            socketio.emit("decrypt", { data: message });
+            messageInput.value = ""; // Clear the input after sending
+        }
     }
 
 </script>

@@ -1,0 +1,48 @@
+.header{
+    margin-left: 5%;
+    margin-top: 3%;
+
+}
+.header2{
+    margin-left: 10%;
+}
+
+html, body {
+    height: 100%; /* Make sure the html and body elements cover the full height of the screen */
+    margin: 0; /* Remove default margin from the body element */
+    padding: 0; /* Remove default padding from the body element */
+    overflow: hidden; /* Optional: Prevent scrollbars */
+  }
+  
+  body {
+    background-image: url('/static/img/img2.jpg'); /* Replace with the path to your background image */
+    background-position: center center; /* Center the image on the page */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Optional: Fix the position of the image */
+    background-size: 100% 100%; /* Stretch the image to cover the entire body element */
+  }
+  
+  .wrapper {
+    display: flex; /* This establishes a flex container */
+    align-items: flex-start; /* This will align the items to the start of the cross-axis */
+  }
+  
+  .public, .private {
+    margin-top: 6.5%; /* Top margin is fine */
+    width: 320px;
+    text-align: center;
+
+  }
+
+  .public{
+    margin-left: 13%;
+  }
+  
+  .private{
+    color: antiquewhite;
+    margin-left: 26%;
+  }
+
+
+
+  

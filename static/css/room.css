@@ -1,0 +1,33 @@
+/* Adjustments for .chatbox */
+.chatbox {
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+    background-color: rgb(245, 245, 245);
+    height: 500px; /* Limit the height of the .chatbox */
+    display: flex;
+    flex-direction: column;
+    width: 1000px;
+    align-items: stretch;
+    margin: 0 auto; /* Center the .chatbox horizontally */
+    padding: 15px;
+    position: relative; /* Add position:relative to establish a positioning context */
+}
+
+.inputs {
+    padding: 10px;
+    position: absolute;
+    margin: 1px;
+    margin-left: 140px;
+}
+
+.muted {
+    font-size: 10px;
+    color: darkgray;
+    text-align: right; /* Align the text to the right */
+}
+  
+.messages {
+    overflow-y: scroll;
+    flex: 1;
+  }

@@ -1,13 +1,26 @@
 {% extends 'base.html' %} {% block content %}
+<link
+rel="stylesheet"
+href="{{url_for('static', filename='css/join.css')}}"
+/>
+<div class="join"> 
 
-<div> 
-    <form method="POST" action="/process_join_room">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <label for="key">Room Key:</label>
-        <input type="text" id="key" name="key" required>
-        <input type="submit" value="Enter">
-    </form>
+<div class="header">
+    <h2>Join a room now and start chatting!</h2>
+</div>
+    <div style="margin-left: 85px;">
+        <form method="POST" action="/process_join_room">
+            <label for="name">Enter your username:</label>
+            <br>
+            <input type="text" id="name" name="name" required style="padding : 2px;">
+            <br>
+            <br>
+            <label for="key">Enter room key:</label>
+            <br>
+            <input type="text" id="key" name="key" required style="padding : 2px;">
+            <input type="submit" value="Enter" class="submit">
+        </form>
+    </div>
 </div>
 
 

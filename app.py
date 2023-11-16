@@ -1,7 +1,9 @@
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 import random
 from string import ascii_uppercase
 from flask_socketio import SocketIO, emit, leave_room, send, join_room
+
+from HillCipher import EncryptHC
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "line&joods"
@@ -128,9 +130,14 @@ def message(data):
     if room_key not in room_keys:
         return False
     
+    user_key = [[7, 3], [2, 5]]
+    
+    cipher = EncryptHC(data['data'], user_key, 26)
+    ciphertext = cipher.encrypt(data['data'])
+
     content = {
         "name": user_name,
-        "message": data['data']
+        "message": str(ciphertext)
     }
     
     # append messages sent to history
@@ -139,6 +146,30 @@ def message(data):
     send(content, to=room_key)
 
     print(f"{user_name} said: {data['data']}")
+
+@socketio.on('decrypt')
+def decrypt(data):
+    user_name = session.get("name")
+    room_key = session.get("room")
+
+    if room_key not in room_keys:
+        return False
+    
+    user_key = [[7, 3], [2, 5]]
+    
+    cipher = EncryptHC(data['data'], user_key, 26)
+    ciphertext = cipher.decrypt(data['data'])
+
+    content = {
+        "name": "Decrypted",
+        "message": str(ciphertext)
+    }
+    
+    # Send the decrypted message only to the client who requested it
+    emit('message', content, room=request.sid)
+
+    print(f"{user_name} said: {data['data']}")
+    
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

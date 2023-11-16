@@ -1,12 +1,31 @@
 {% extends 'base.html' %} {% block content %}
-
+<link
+rel="stylesheet"
+href="{{url_for('static', filename='css/home.css')}}"
+/>
 <div> 
-    <h1>Chat App</h1>
-    <h3>Welcome to Chat App</h3>
-    <p>Already have a room? Join it now!</p>
-    <a href="/join_room"><button>JOIN</button></a>  
-    <p>Don't have a room? Create one now!</p>
-    <a href="/create_room"><button>CREATE</button></a> 
+    <h1 class="header">Welcome to Chat App</h1>
+    <h3 class="header2">Creators: Joudy Sabbagh & Lynn el Shami</h3>
+    <div class="wrapper">
+        <!-- you need to create new process for when encryption is not needed. -->
+        <div class="public">
+            <h4>Secrets? What are those?<br> Spill your thoughts out loud and clear in here! </h4>
+            <p>Already have a room? Join it now!</p>
+            <a href="/join_room"><button>JOIN</button></a>  
+            <p>Don't have a room? Create one now!</p>
+            <a href="/create_room"><button>CREATE</button></a> 
+        </div>
+
+        <!-- this is joudy's part-->
+        <div class="private">
+            <h4> Shhh... Got a secret? <br>Let it out in our ultra-secure rooms! </h4>
+            <p>Already have a room? Join it now!</p>
+            <a href="/join_room"><button>JOIN</button></a>  
+            <p>Don't have a room? Create one now!</p>
+            <a href="/create_room"><button>CREATE</button></a> 
+        </div>
+    </div>
+   
 </div>
 
 

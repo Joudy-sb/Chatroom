@@ -1,0 +1,23 @@
+.header{
+    text-align: center;
+}
+
+.join{
+    margin-top: 230px;
+    margin-left: 430px;
+    text-align: justify;
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+    background-color: rgba(245, 245, 245, 0.831);
+    height: 220px;
+    width: 450px;
+}
+
+  .submit{
+    margin-left: 50px;
+    padding : 3px;
+    width: 65px;
+  }
+
+  
